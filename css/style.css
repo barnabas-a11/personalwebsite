@@ -231,3 +231,9 @@ footer {
 
 /* Kontakt doboz */
 .contact-box ul li a { color: var(--accent-blue); }
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
