@@ -1,0 +1,37 @@
+[
+    {
+        "id": "emotet-sample-442",
+        "title": "Emotet Variant #442 Analysis",
+        "date": "2023-10-12",
+        "tag": "MALWARE",
+        "summary": "Unpacking the loader and identifying new C2 obfuscation techniques.",
+        "intro": "Detailed static and dynamic analysis of a suspicious binary found in the finance department. The objective is to determine capabilities and IOCs.",
+        "steps": [
+            {
+                "title": "01. Sample Acquisition",
+                "content": "The file was delivered via a phishing email disguised as an invoice. PE Studio indicates high entropy.",
+                "code": "File Type: PE32 executable (GUI) Intel 80386\nEntropy: 7.821 (Packed)\nImports: KERNEL32.dll (suspiciously low)"
+            },
+            {
+                "title": "02. Unpacking & Deobfuscation",
+                "content": "Loaded sample into x64dbg. Set breakpoints on VirtualAlloc. Upon execution, the malware allocated memory.",
+                "code": "bp VirtualAlloc\nrun\n# Wait for allocation\nfollow in dump"
+            }
+        ]
+    },
+    {
+        "id": "ransomware-artifacts",
+        "title": "Windows Server Ransomware Artifacts",
+        "date": "2023-09-01",
+        "tag": "FORENSICS",
+        "summary": "Disk forensics breakdown identifying patient zero.",
+        "intro": "Investigating a compromised server to find the entry point.",
+        "steps": [
+            {
+                "title": "01. MFT Analysis",
+                "content": "Parsed the Master File Table to find creation timestamps of encrypted files.",
+                "code": "MFTECmd.exe -f \"C:\\$MFT\" --csv \"c:\\temp\\out.csv\""
+            }
+        ]
+    }
+]
