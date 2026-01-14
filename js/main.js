@@ -58,7 +58,9 @@ async function loadPosts() {
 
         container.innerHTML = ''; 
 
-        posts.forEach(post => {
+        const recentPosts = posts.slice(0, 4);
+
+        recentPosts.forEach(post => {
             const linkUrl = `walkthroughs/view.html?id=${post.id}`;
             const html = `
                 <a href="${linkUrl}" class="post-item">

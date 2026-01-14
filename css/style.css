@@ -42,6 +42,11 @@
     100% { transform: translate(0, 0); }
 }
 
+@keyframes matrixFall {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 0% 100px; }
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -192,7 +197,6 @@ nav {
     font-weight: 700;
     border-radius: 4px;
     border: 1px solid var(--border-color);
-    animation: float 3s ease-in-out infinite;
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
 
@@ -240,16 +244,26 @@ section:hover h2::after {
     border: 1px solid var(--border-color);
     padding: 25px;
     border-radius: 8px;
-    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.2s ease, box-shadow 0.2s ease;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.2s ease, box-shadow 0.2s ease, background 0.3s ease;
+    overflow: hidden;
 }
 
 .skill-card:hover {
     transform: translateY(-8px) scale(1.02);
     border-color: var(--accent-blue);
-    box-shadow: 0 10px 30px rgba(59, 130, 246, 0.15);
+    box-shadow: 0 10px 30px rgba(59, 130, 246, 0.2);
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='5' y='20' fill='rgba(59, 130, 246, 0.15)' font-family='monospace' font-size='14'%3E1%3C/text%3E%3Ctext x='25' y='40' fill='rgba(59, 130, 246, 0.15)' font-family='monospace' font-size='14'%3E0%3C/text%3E%3Ctext x='45' y='10' fill='rgba(59, 130, 246, 0.15)' font-family='monospace' font-size='14'%3E1%3C/text%3E%3Ctext x='15' y='50' fill='rgba(59, 130, 246, 0.15)' font-family='monospace' font-size='14'%3E0%3C/text%3E%3C/svg%3E");
+    background-color: #0f172a;
+    animation: matrixFall 1.5s linear infinite;
 }
 
-.skill-card h3 { font-size: 1.1rem; margin-bottom: 10px; color: var(--text-main); }
+.skill-card:hover h3, 
+.skill-card:hover .text-blue {
+    color: #ffffff;
+    text-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
+}
+
+.skill-card h3 { font-size: 1.1rem; margin-bottom: 10px; color: var(--text-main); transition: color 0.3s ease;}
 .skill-card p { font-size: 0.95rem; color: var(--text-muted); }
 
 .post-list { display: flex; flex-direction: column; gap: 20px; }
@@ -316,6 +330,10 @@ img {
     height: auto;
     display: block;
     border-radius: 8px;
+    padding: 5px;
+    background: var(--brand-gradient);
+    background-size: 300% 300%;
+    animation: gradientMove 3s ease infinite;
 }
 
 @media (max-width: 768px) {
