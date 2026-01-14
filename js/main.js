@@ -1,70 +1,62 @@
-// js/main.js - DEBUG VERSION
-
 document.addEventListener('DOMContentLoaded', () => {
-    console.log(">> MAIN.JS ELINDULT");
+    console.log(">> MAIN.JS STARTED");
     
-    // Két dolgot indítunk el egyszerre
     loadComponents();
     loadPosts();
 });
 
-// 1. Fejléc és Lábléc betöltése
 async function loadComponents() {
     try {
-        console.log(">> Header betöltése folyamatban...");
+        console.log(">> Loading header...");
         
-        // Header
         const headerRes = await fetch('components/header.html');
-        if (!headerRes.ok) throw new Error(`HTTP hiba! Status: ${headerRes.status}`);
+        if (!headerRes.ok) throw new Error(`HTTP Error! Status: ${headerRes.status}`);
         
         let headerHtml = await headerRes.text();
-        // A prefix törlése
         headerHtml = headerHtml.replaceAll('{{prefix}}', ''); 
         
         const headerElement = document.querySelector('header');
         if(headerElement) {
             headerElement.innerHTML = headerHtml;
-            console.log(">> Header sikeresen beillesztve.");
+            console.log(">> Header successfully inserted.");
         } else {
-            console.error(">> HIBA: Nem találom a <header> taget a HTML-ben!");
+            console.error(">> ERROR: <header> tag not found in HTML!");
         }
 
-        // Footer
-        console.log(">> Footer betöltése folyamatban...");
+        console.log(">> Loading footer...");
         const footerRes = await fetch('components/footer.html');
-        if (!footerRes.ok) throw new Error(`HTTP hiba! Status: ${footerRes.status}`);
+        if (!footerRes.ok) throw new Error(`HTTP Error! Status: ${footerRes.status}`);
         
         const footerElement = document.querySelector('footer');
         if(footerElement) {
             footerElement.innerHTML = await footerRes.text();
-            console.log(">> Footer sikeresen beillesztve.");
+            console.log(">> Footer successfully inserted.");
         }
 
     } catch (e) {
-        console.error(">> KRITIKUS HIBA A KOMPONENSEK BETÖLTÉSEKOR:", e);
+        console.error(">> CRITICAL ERROR LOADING COMPONENTS:", e);
     }
 }
 
-// 2. Posztok betöltése
 async function loadPosts() {
     const container = document.getElementById('post-container');
     if(!container) {
-        console.error(">> HIBA: Nem találom a 'post-container' ID-t a HTML-ben!");
+        console.error(">> ERROR: 'post-container' ID not found in HTML!");
         return;
     }
 
     try {
-        console.log(">> JSON adatbázis keresése...");
+        console.log(">> Fetching JSON database...");
         const response = await fetch('data/cases.json');
         
         if (!response.ok) {
-            throw new Error(`Nem találom a data/cases.json fájlt. Status: ${response.status}`);
+            throw new Error(`data/cases.json not found. Status: ${response.status}`);
         }
         
         const posts = await response.json();
-        console.log(">> JSON sikeresen betöltve. Elemek száma:", posts.length);
+        console.log(">> JSON successfully loaded. Item count:", posts.length);
 
-        container.innerHTML = ''; // Töröljük a loading szöveget
+        container.innerHTML = ''; 
 
         posts.forEach(post => {
             const linkUrl = `walkthroughs/view.html?id=${post.id}`;
@@ -79,10 +71,10 @@ async function loadPosts() {
             `;
             container.innerHTML += html;
         });
-        console.log(">> Posztok renderelése kész.");
+        console.log(">> Posts rendering complete.");
 
     } catch (e) {
-        console.error(">> HIBA A POSZTOK BETÖLTÉSEKOR:", e);
-        container.innerHTML = `<p class="mono" style="color: red;">HIBA: ${e.message}.<br>Nyisd meg a konzolt (F12) a részletekért.</p>`;
+        console.error(">> ERROR LOADING POSTS:", e);
+        container.innerHTML = `<p class="mono" style="color: red;">ERROR: ${e.message}.<br>Open console (F12) for details.</p>`;
     }
 }

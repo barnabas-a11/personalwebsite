@@ -1,8 +1,6 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    // 1. Header/Footer betöltése (ugyanaz a logika, mint main.js-ben)
     await loadComponents();
 
-    // 2. URL paraméter kiolvasása (?id=...)
     const urlParams = new URLSearchParams(window.location.search);
     const caseId = urlParams.get('id');
 
@@ -11,13 +9,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    // 3. Adat betöltése és renderelés
     loadCaseData(caseId);
 });
 
 async function loadComponents() {
     try {
-        // Mivel a walkthroughs mappában vagyunk, egy szinttel feljebb kell menni (../)
         const headerRes = await fetch('../components/header.html');
         let headerHtml = await headerRes.text();
         headerHtml = headerHtml.replaceAll('{{prefix}}', '../'); 
@@ -32,11 +28,9 @@ async function loadComponents() {
 
 async function loadCaseData(id) {
     try {
-        // A JSON betöltése
         const response = await fetch('../data/cases.json');
         const cases = await response.json();
 
-        // Megkeressük a megfelelő ID-t
         const currentCase = cases.find(c => c.id === id);
 
         if (!currentCase) {
@@ -44,18 +38,14 @@ async function loadCaseData(id) {
             return;
         }
 
-        // --- Adatok beillesztése a HTML-be ---
-        
-        // Cím és Meta
         document.title = `${currentCase.title} | JD Security`;
         document.getElementById('case-tag').innerText = currentCase.tag;
         document.getElementById('case-title').innerText = currentCase.title;
         document.getElementById('case-meta').innerText = `DATE: ${currentCase.date} | ID: ${currentCase.id}`;
         document.getElementById('case-intro').innerText = currentCase.intro;
 
-        // Lépések generálása (Accordions)
         const stepsContainer = document.getElementById('steps-container');
-        stepsContainer.innerHTML = ''; // Törlés biztos ami biztos
+        stepsContainer.innerHTML = '';
 
         currentCase.steps.forEach((step, index) => {
             const stepHtml = `
@@ -79,7 +69,6 @@ async function loadCaseData(id) {
     }
 }
 
-// Egyszerű toggle funkció az accordionhoz (globálisra tesszük, hogy a HTML-ből hívható legyen)
 window.toggleStep = function(headerElement) {
     const content = headerElement.nextElementSibling;
     const icon = headerElement.querySelector('.toggle-icon');
