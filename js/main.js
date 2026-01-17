@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadComponents();
     loadPosts();
     initSkillIssueTicker();
+    initCryptoCopier();
 });
 
 async function loadComponents() {
@@ -153,4 +154,32 @@ function translateToBrainrot() {
     
     const statusBadge = document.querySelector('.status-badge');
     if(statusBadge) statusBadge.innerText = "STATUS: OHIO RIZZ";
+}
+
+function initCryptoCopier() {
+    const addresses = document.querySelectorAll('.crypto-addr');
+    
+    addresses.forEach(addr => {
+        addr.addEventListener('click', async () => {
+            const originalText = addr.innerText;
+            const cleanAddress = originalText.replace(/\s/g, '');
+
+            try {
+                await navigator.clipboard.writeText(cleanAddress);
+                
+                // Visual Feedback
+                addr.classList.add('copied');
+                addr.innerText = "[ ADDRESS COPIED ]";
+                
+                setTimeout(() => {
+                    addr.classList.remove('copied');
+                    addr.innerText = originalText;
+                }, 1500);
+                
+            } catch (err) {
+                console.error('Copy failed:', err);
+                addr.style.borderColor = '#ef4444';
+            }
+        });
+    });
 }
