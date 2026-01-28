@@ -1,9 +1,96 @@
 document.addEventListener('DOMContentLoaded', () => {
     loadComponents();
-    loadPosts();
+    loadRecentPosts(); 
     initSkillIssueTicker();
     initCryptoCopier();
+
+    if (document.getElementById('sec-grid')) {
+        initSearchableGrid('sec', 'sec-grid', 'sec-search');
+    }
+    if (document.getElementById('magic-grid')) {
+        initSearchableGrid('magic', 'magic-grid', 'magic-search');
+    }
 });
+
+async function loadRecentPosts() {
+    const container = document.getElementById('post-container');
+    if (!container) return;
+
+    try {
+        const response = await fetch('data/cases.json');
+        const posts = await response.json();
+        const recentPosts = posts.filter(p => !p.category || p.category === 'sec').slice(0, 4);
+        
+        container.innerHTML = '';
+        recentPosts.forEach(post => {
+            container.innerHTML += `
+                <a href="walkthroughs/view.html?id=${post.id}" class="post-item">
+                    <span class="post-meta mono"><span class="post-tag">[${post.tag}]</span> ${post.date}</span>
+                    <h3>${post.title}</h3>
+                    <p>${post.summary}</p> 
+                </a>`;
+        });
+    } catch(e) { console.error(e); }
+}
+
+async function initSearchableGrid(category, gridId, searchId) {
+    const grid = document.getElementById(gridId);
+    const searchInput = document.getElementById(searchId);
+    if (!grid) return;
+
+    try {
+        const response = await fetch('data/cases.json');
+        const allPosts = await response.json();
+        const categoryPosts = allPosts.filter(p => p.category === category);
+
+        const render = (items) => {
+            grid.innerHTML = '';
+            if (items.length === 0) {
+                grid.innerHTML = '<p class="mono" style="color: var(--text-muted);">No results found.</p>';
+                return;
+            }
+
+            items.forEach(post => {
+                let imageHtml = '';
+                let cardClass = 'sec-card';
+
+                if (category === 'magic' && post.thumbnail) {
+                    imageHtml = `<div class="card-img" style="background-image: url('${post.thumbnail}');"></div>`;
+                    cardClass += ' has-image';
+                }
+
+                grid.innerHTML += `
+                    <a href="walkthroughs/view.html?id=${post.id}" class="skill-card ${cardClass}">
+                        ${imageHtml}
+                        <div class="card-content">
+                            <h3 class="mono text-blue">${post.title}</h3>
+                            <span class="mono" style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-top: 5px;">
+                                [${post.tag}] ${post.date}
+                            </span>
+                        </div>
+                    </a>`;
+            });
+        };
+
+        render(categoryPosts);
+
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                const term = e.target.value.toLowerCase();
+                const filtered = categoryPosts.filter(post => 
+                    post.title.toLowerCase().includes(term) || 
+                    post.tag.toLowerCase().includes(term) ||
+                    post.summary.toLowerCase().includes(term)
+                );
+                render(filtered);
+            });
+        }
+
+    } catch (e) {
+        console.error("Grid error:", e);
+        grid.innerHTML = '<p class="mono">Failed to load data.</p>';
+    }
+}
 
 async function loadComponents() {
     try {
@@ -29,46 +116,6 @@ async function loadComponents() {
             if(btn) btn.addEventListener('click', toggleBrainrot);
         }
 
-    } catch (e) {
-        console.error(e);
-    }
-}
-
-async function loadPosts() {
-    const recentContainer = document.getElementById('post-container');
-    const allContainer = document.getElementById('all-cases-container');
-
-    if (!recentContainer && !allContainer) return;
-
-    try {
-        const response = await fetch('data/cases.json');
-        if (!response.ok) throw new Error(`Status: ${response.status}`);
-        const posts = await response.json();
-
-        if (recentContainer) {
-            recentContainer.innerHTML = ''; 
-            const recentPosts = posts.slice(0, 4);
-            recentPosts.forEach(post => {
-                const linkUrl = `walkthroughs/view.html?id=${post.id}`;
-                recentContainer.innerHTML += `
-                    <a href="${linkUrl}" class="post-item">
-                        <span class="post-meta mono"><span class="post-tag">[${post.tag}]</span> ${post.date}</span>
-                        <h3>${post.title}</h3>
-                        <p>${post.summary}</p> 
-                    </a>`;
-            });
-        }
-
-        if (allContainer) {
-            allContainer.innerHTML = '';
-            posts.forEach(post => {
-                const linkUrl = `walkthroughs/view.html?id=${post.id}`;
-                allContainer.innerHTML += `
-                    <a href="${linkUrl}" class="skill-card sec-card">
-                        <h3 class="mono text-blue">${post.title}</h3>
-                    </a>`;
-            });
-        }
     } catch (e) {
         console.error(e);
     }
@@ -167,7 +214,6 @@ function initCryptoCopier() {
             try {
                 await navigator.clipboard.writeText(cleanAddress);
                 
-                // Visual Feedback
                 addr.classList.add('copied');
                 addr.innerText = "[ ADDRESS COPIED ]";
                 

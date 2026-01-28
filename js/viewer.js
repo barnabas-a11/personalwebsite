@@ -16,7 +16,7 @@ async function loadComponents() {
     try {
         const headerRes = await fetch('../components/header.html');
         let headerHtml = await headerRes.text();
-        headerHtml = headerHtml.replaceAll('{{prefix}}', '../'); 
+        headerHtml = headerHtml.replaceAll('{{prefix}}', '../');
         document.querySelector('header').innerHTML = headerHtml;
 
         const footerRes = await fetch('../components/footer.html');
@@ -48,15 +48,22 @@ async function loadCaseData(id) {
         stepsContainer.innerHTML = '';
 
         currentCase.steps.forEach((step, index) => {
+            let imageHtml = '';
+            if (step.image) {
+                const imgPath = step.image.startsWith('http') ? step.image : '../' + step.image;
+                imageHtml = `<img src="${imgPath}" alt="Step Image" style="margin-top: 20px; border-radius: 6px; border: 1px solid var(--border-color); width: 100%; max-height: 500px; object-fit: contain; background: #000;">`;
+            }
+
             const stepHtml = `
-                <div class="analysis-step" style="border: 1px solid var(--border-color); margin-bottom: 20px; border-radius: 8px; overflow: hidden; background: white;">
-                    <div class="step-header mono" onclick="toggleStep(this)" style="padding: 15px 20px; background: #f8fafc; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 600;">
+                <div class="analysis-step" style="border: 1px solid var(--border-color); margin-bottom: 20px; border-radius: 8px; overflow: hidden; background: var(--card-bg);">
+                    <div class="step-header mono" onclick="toggleStep(this)" style="padding: 15px 20px; background: rgba(30, 41, 59, 0.5); cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 600; color: var(--text-main);">
                         <span>${step.title}</span>
                         <span class="toggle-icon text-blue">+</span>
                     </div>
                     <div class="step-content" style="display: none; padding: 25px; border-top: 1px solid var(--border-color);">
                         <p>${step.content}</p>
-                        ${step.code ? `<pre style="background: var(--code-bg); color: var(--code-text); padding: 15px; border-radius: 6px; overflow-x: auto; margin-top: 15px; font-size: 0.9rem;"><code>${step.code}</code></pre>` : ''}
+                        ${imageHtml}
+                        ${step.code ? `<pre style="background: var(--code-bg); color: #4ade80; padding: 15px; border-radius: 6px; overflow-x: auto; margin-top: 15px; font-size: 0.9rem;"><code>${step.code}</code></pre>` : ''}
                     </div>
                 </div>
             `;
@@ -69,10 +76,10 @@ async function loadCaseData(id) {
     }
 }
 
-window.toggleStep = function(headerElement) {
+window.toggleStep = function (headerElement) {
     const content = headerElement.nextElementSibling;
     const icon = headerElement.querySelector('.toggle-icon');
-    
+
     if (content.style.display === 'none') {
         content.style.display = 'block';
         icon.innerText = '-';
