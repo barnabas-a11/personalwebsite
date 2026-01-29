@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     loadComponents();
-    loadRecentPosts(); 
+    loadRecentPosts();
     initSkillIssueTicker();
     initCryptoCopier();
 
@@ -17,20 +17,35 @@ async function loadRecentPosts() {
     if (!container) return;
 
     try {
-        const response = await fetch('data/cases.json');
+        const response = await fetch(`data/cases.json?v=${new Date().getTime()}`);
+        if (!response.ok) throw new Error(`Status: ${response.status}`);
         const posts = await response.json();
-        const recentPosts = posts.filter(p => !p.category || p.category === 'sec').slice(0, 4);
-        
+
         container.innerHTML = '';
-        recentPosts.forEach(post => {
+
+        const recentItems = posts.slice(0, 6);
+
+        recentItems.forEach(post => {
+            const linkUrl = `walkthroughs/view.html?id=${post.id}`;
+
+            const tagStyle = post.category === 'magic'
+                ? 'color: #a855f7; background: rgba(168, 85, 247, 0.1);'
+                : '';
+                
             container.innerHTML += `
-                <a href="walkthroughs/view.html?id=${post.id}" class="post-item">
-                    <span class="post-meta mono"><span class="post-tag">[${post.tag}]</span> ${post.date}</span>
+                <a href="${linkUrl}" class="post-item">
+                    <span class="post-meta mono">
+                        <span class="post-tag" style="${tagStyle}">[${post.tag}]</span> 
+                        ${post.date}
+                    </span>
                     <h3>${post.title}</h3>
                     <p>${post.summary}</p> 
                 </a>`;
         });
-    } catch(e) { console.error(e); }
+    } catch (e) {
+        console.error("Failed to sync intelligence data:", e);
+        container.innerHTML = '<p class="mono">Failed to load local intelligence.</p>';
+    }
 }
 
 async function initSearchableGrid(category, gridId, searchId) {
@@ -77,8 +92,8 @@ async function initSearchableGrid(category, gridId, searchId) {
         if (searchInput) {
             searchInput.addEventListener('input', (e) => {
                 const term = e.target.value.toLowerCase();
-                const filtered = categoryPosts.filter(post => 
-                    post.title.toLowerCase().includes(term) || 
+                const filtered = categoryPosts.filter(post =>
+                    post.title.toLowerCase().includes(term) ||
                     post.tag.toLowerCase().includes(term) ||
                     post.summary.toLowerCase().includes(term)
                 );
@@ -96,24 +111,24 @@ async function loadComponents() {
     try {
         const headerRes = await fetch('components/header.html');
         if (!headerRes.ok) throw new Error(`HTTP Error! Status: ${headerRes.status}`);
-        
+
         let headerHtml = await headerRes.text();
-        headerHtml = headerHtml.replaceAll('{{prefix}}', ''); 
-        
+        headerHtml = headerHtml.replaceAll('{{prefix}}', '');
+
         const headerElement = document.querySelector('header');
-        if(headerElement) {
+        if (headerElement) {
             headerElement.innerHTML = headerHtml;
         }
 
         const footerRes = await fetch('components/footer.html');
         if (!footerRes.ok) throw new Error(`HTTP Error! Status: ${footerRes.status}`);
-        
+
         const footerElement = document.querySelector('footer');
-        if(footerElement) {
+        if (footerElement) {
             footerElement.innerHTML = await footerRes.text();
 
             const btn = document.getElementById('brainrot-btn');
-            if(btn) btn.addEventListener('click', toggleBrainrot);
+            if (btn) btn.addEventListener('click', toggleBrainrot);
         }
 
     } catch (e) {
@@ -138,7 +153,7 @@ function initSkillIssueTicker() {
     const observer = new MutationObserver((mutations, obs) => {
         const tickerContainer = document.getElementById('skill-issue-feed');
         if (tickerContainer) {
-            const content = [...messages, ...messages, ...messages].map(msg => 
+            const content = [...messages, ...messages, ...messages].map(msg =>
                 `<span class="ticker-item">${msg}</span>`
             ).join('');
             tickerContainer.innerHTML = content;
@@ -152,7 +167,7 @@ function initSkillIssueTicker() {
 function toggleBrainrot() {
     const isActive = document.body.classList.toggle('brainrot-mode');
     const btn = document.getElementById('brainrot-btn');
-    
+
     if (isActive) {
         btn.innerText = "[ NORMIE MODE ]";
         btn.style.color = "#ff0000";
@@ -160,7 +175,7 @@ function toggleBrainrot() {
     } else {
         btn.innerText = "[ TOGGLE BRAINROT ]";
         btn.style.color = "";
-        location.reload(); 
+        location.reload();
     }
 }
 
@@ -198,14 +213,14 @@ function translateToBrainrot() {
             node.nodeValue = text;
         }
     }
-    
+
     const statusBadge = document.querySelector('.status-badge');
-    if(statusBadge) statusBadge.innerText = "STATUS: OHIO RIZZ";
+    if (statusBadge) statusBadge.innerText = "STATUS: OHIO RIZZ";
 }
 
 function initCryptoCopier() {
     const addresses = document.querySelectorAll('.crypto-addr');
-    
+
     addresses.forEach(addr => {
         addr.addEventListener('click', async () => {
             const originalText = addr.innerText;
@@ -213,15 +228,15 @@ function initCryptoCopier() {
 
             try {
                 await navigator.clipboard.writeText(cleanAddress);
-                
+
                 addr.classList.add('copied');
                 addr.innerText = "[ ADDRESS COPIED ]";
-                
+
                 setTimeout(() => {
                     addr.classList.remove('copied');
                     addr.innerText = originalText;
                 }, 1500);
-                
+
             } catch (err) {
                 console.error('Copy failed:', err);
                 addr.style.borderColor = '#ef4444';
