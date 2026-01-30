@@ -156,7 +156,7 @@
         "id": "s02",
         "category": "sec",
         "title": "Emotet: Hide and Seek Masterclass",
-        "date": "2026-01-011",
+        "date": "2026-01-11",
         "tag": "Trojan",
         "summary": "Banking trojan designed to steal money from people :(",
         "intro": "Emotet is much more of a headache. It doesn't just run; it unfolds like a bad dream. It starts with a Word doc, and honestly, the \"hack\" here is just hoping the user is bored enough to click \"Enable Content.\"",
