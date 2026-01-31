@@ -86,6 +86,12 @@
     padding: 0;
 }
 
+html,
+body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
 body {
     background: var(--surface-gradient);
     background-size: 400% 400%;
@@ -94,7 +100,6 @@ body {
     font-family: var(--font-main);
     line-height: 1.6;
     min-height: 100vh;
-    overflow-x: hidden;
     position: relative;
 }
 
