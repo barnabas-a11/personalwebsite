@@ -545,14 +545,17 @@ img {
 .ticker-wrap {
     width: 100%;
     overflow: hidden;
-    height: 30px;
-    background-color: #facc15;
+    height: 35px;
+    background: rgba(59, 130, 246, 0.1);
+    backdrop-filter: blur(5px);
     padding-left: 100%;
     box-sizing: border-box;
     display: flex;
     align-items: center;
-    border-top: 2px solid #000;
+    border-top: 1px solid var(--accent-blue);
+    border-bottom: 1px solid var(--accent-blue);
     margin-top: 20px;
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.15);
 }
 
 .ticker-content {
@@ -563,9 +566,11 @@ img {
     animation: ticker 120s linear infinite;
     font-family: 'JetBrains Mono', monospace;
     font-weight: 700;
-    color: #000;
+    color: var(--accent-blue);
+    text-shadow: 0 0 10px rgba(59, 130, 246, 0.8);
     font-size: 0.85rem;
     text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .ticker-item {
