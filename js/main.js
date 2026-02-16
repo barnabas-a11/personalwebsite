@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadRecentPosts();
     initSkillIssueTicker();
     initCryptoCopier();
+    initJoyClick();
 
     if (document.getElementById('sec-grid')) {
         initSearchableGrid('sec', 'sec-grid', 'sec-search');
@@ -243,4 +244,36 @@ function initCryptoCopier() {
             }
         });
     });
+}
+
+function initJoyClick() {
+    const badge = document.querySelector('.status-badge');
+    
+    if (badge) {
+        badge.style.cursor = 'help'; 
+        badge.title = "Click for a secret..."; 
+        
+        badge.addEventListener('click', triggerJoy);
+    }
+}
+
+function triggerJoy() {
+    if (document.querySelector('.joy-overlay')) return;
+
+    const overlay = document.createElement('div');
+    overlay.className = 'joy-overlay';
+    
+    const messageBox = document.createElement('div');
+    messageBox.className = 'joy-box';
+    
+    messageBox.innerHTML = `
+        <div class="joy-content">
+            <span class="joy-icon">♥</span>
+            <p>"May this website bring a little joy in your life in this troubled world."</p>
+            <button onclick="this.closest('.joy-overlay').remove()">[ CLOSE ]</button>
+        </div>
+    `;
+
+    overlay.appendChild(messageBox);
+    document.body.appendChild(overlay);
 }
