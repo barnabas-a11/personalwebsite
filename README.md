@@ -1,0 +1,4 @@
+﻿Definitely not a website.
+
+
+It’s essentially a digital fever dream where low-res cat memes meet malware analysis. If the technical deep dives don't get you, the "Brainrot Mode" will instantly boosting your "Brain" until the vibes are thoroughly checked.
