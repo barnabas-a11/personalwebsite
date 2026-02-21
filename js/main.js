@@ -32,7 +32,7 @@ async function loadRecentPosts() {
             const tagStyle = post.category === 'magic'
                 ? 'color: #a855f7; background: rgba(168, 85, 247, 0.1);'
                 : '';
-                
+
             container.innerHTML += `
                 <a href="${linkUrl}" class="post-item">
                     <span class="post-meta mono">
@@ -248,11 +248,11 @@ function initCryptoCopier() {
 
 function initJoyClick() {
     const badge = document.querySelector('.status-badge');
-    
+
     if (badge) {
-        badge.style.cursor = 'help'; 
-        badge.title = "Click for a secret..."; 
-        
+        badge.style.cursor = 'help';
+        badge.title = "Click for a secret...";
+
         badge.addEventListener('click', triggerJoy);
     }
 }
@@ -262,10 +262,10 @@ function triggerJoy() {
 
     const overlay = document.createElement('div');
     overlay.className = 'joy-overlay';
-    
+
     const messageBox = document.createElement('div');
     messageBox.className = 'joy-box';
-    
+
     messageBox.innerHTML = `
         <div class="joy-content">
             <span class="joy-icon">♥</span>
